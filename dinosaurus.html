@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .scene {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dino {
+            position: absolute;
+            bottom: 20%;
+            transition: transform 0.5s ease;
+        }
+
+        #dino1 {
+            left: -80px;
+        }
+
+        #dino2 {
+            right: 20%;
+        }
+
+        .dino-facing-left {
+            transform: scaleX(-1);
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: red;
+            z-index: 10;
+            opacity: 0;
+            transition: all 0.8s ease-in-out;
+        }
+
+        .heart-in-hand {
+            font-size: 16px;
+            opacity: 1;
+        }
+
+        .broken-heart {
+            position: absolute;
+            font-size: 24px;
+            color: red;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .sad-text {
+            font-size: 20px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s;
+            padding: 0 10px;
+        }
+
+        /* Dinosaurus style */
+        .dino-body {
+            position: relative;
+            width: 80px;
+            height: 35px;
+            background-color: black;
+            border-radius: 15px 8px 8px 15px;
+        }
+
+        .dino-head {
+            position: absolute;
+            width: 30px;
+            height: 25px;
+            background-color: black;
+            border-radius: 10px 15px 5px 10px;
+            top: -15px;
+            right: -10px;
+        }
+
+        .dino-eye {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+            top: 5px;
+            right: 5px;
+        }
+
+        .dino-mouth {
+            position: absolute;
+            width: 8px;
+            height: 3px;
+            background-color: white;
+            bottom: 5px;
+            right: 8px;
+            border-radius: 2px;
+        }
+
+        .dino-arm {
+            position: absolute;
+            width: 8px;
+            height: 15px;
+            background-color: black;
+            top: 5px;
+            right: -5px;
+            border-radius: 4px;
+            transform-origin: top center;
+        }
+
+        .dino-leg {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: black;
+            bottom: -20px;
+            border-radius: 5px 5px 0 0;
+            transform-origin: top center;
+        }
+
+        .leg1 { left: 15px; }
+        .leg2 { left: 35px; }
+        .leg3 { left: 55px; }
+
+        .dino-tail {
+            position: absolute;
+            width: 25px;
+            height: 8px;
+            background-color: black;
+            left: -20px;
+            top: 10px;
+            border-radius: 8px 0 0 8px;
+            transform: rotate(-10deg);
+        }
+
+        .dino-spike {
+            position: absolute;
+            width: 8px;
+            height: 15px;
+            background-color: black;
+            top: -10px;
+            left: 20px;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .spike2 { left: 35px; height: 12px; top: -8px; }
+        .spike3 { left: 50px; height: 10px; top: -6px; }
+
+        /* Walking animation untuk kaki */
+        @keyframes walkLegs {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        @keyframes walkArm {
+            0%, 100% { transform: rotate(5deg); }
+            50% { transform: rotate(-5deg); }
+        }
+
+        .walking .leg1 { animation: walkLegs 0.3s infinite; }
+        .walking .leg2 { animation: walkLegs 0.3s infinite 0.1s; }
+        .walking .leg3 { animation: walkLegs 0.3s infinite 0.2s; }
+        .walking .dino-arm { animation: walkArm 0.3s infinite; }
+
+        @keyframes walkAcross {
+            0% { left: -80px; }
+            100% { left: 30%; }
+        }
+
+        .walk-across {
+            animation: walkAcross 3s ease-out forwards;
+        }
+
+        @keyframes runAway {
+            0% { right: 20%; transform: scaleX(-1); }
+            100% { right: -100px; transform: scaleX(-1); }
+        }
+
+        .run-away {
+            animation: runAway 2s ease-in forwards;
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <!-- Dinosaurus 1 (yang kasih hati) -->
+        <div id="dino1" class="dino">
+            <div class="dino-body">
+                <div class="dino-tail"></div>
+                <div class="dino-spike"></div>
+                <div class="dino-spike spike2"></div>
+                <div class="dino-spike spike3"></div>
+                <div class="dino-head">
+                    <div class="dino-eye"></div>
+                    <div class="dino-mouth"></div>
+                </div>
+                <div class="dino-arm" id="dino1Arm"></div>
+                <div class="dino-leg leg1"></div>
+                <div class="dino-leg leg2"></div>
+                <div class="dino-leg leg3"></div>
+            </div>
+        </div>
+        
+        <!-- Dinosaurus 2 (yang nolak) -->
+        <div id="dino2" class="dino dino-facing-left">
+            <div class="dino-body">
+                <div class="dino-tail"></div>
+                <div class="dino-spike"></div>
+                <div class="dino-spike spike2"></div>
+                <div class="dino-spike spike3"></div>
+                <div class="dino-head">
+                    <div class="dino-eye"></div>
+                    <div class="dino-mouth"></div>
+                </div>
+                <div class="dino-arm"></div>
+                <div class="dino-leg leg1"></div>
+                <div class="dino-leg leg2"></div>
+                <div class="dino-leg leg3"></div>
+            </div>
+        </div>
+        
+        <div id="heart" class="heart">❤️</div>
+        <div id="brokenHeart" class="broken-heart">💔</div>
+    </div>
+    
+    <div id="sadText" class="sad-text">Why does love have to hurt so much?...</div>
+
+    <button class="restart-btn" onclick="restartAnimation()">Play Again</button>
+
+    <script>
+        let heartCount = 0;
+        const maxHearts = 3;
+
+        function startAnimation() {
+            const dino1 = document.getElementById('dino1');
+            const dino2 = document.getElementById('dino2');
+            const heart = document.getElementById('heart');
+            const brokenHeart = document.getElementById('brokenHeart');
+            const sadText = document.getElementById('sadText');
+            const dino1Arm = document.getElementById('dino1Arm');
+
+            // Reset semua elemen
+            dino1.style.left = '-80px';
+            dino2.style.right = '20%';
+            dino2.classList.remove('run-away');
+            dino2.classList.add('dino-facing-left'); // Hadap ke kiri (ke dino1)
+            
+            heart.style.opacity = '0';
+            heart.classList.remove('heart-in-hand');
+            brokenHeart.style.opacity = '0';
+            sadText.style.opacity = '0';
+
+            // Dino 1 jalan dari kiri ke tengah
+            dino1.classList.add('walking', 'walk-across');
+
+            setTimeout(() => {
+                // Berhenti jalan dan mulai memberi hati
+                dino1.classList.remove('walking');
+                giveHeart();
+            }, 3000);
+
+            function giveHeart() {
+                if (heartCount >= maxHearts) {
+                    // Dino2 berbalik dan pergi
+                    dino2.classList.remove('dino-facing-left');
+                    dino2.classList.add('run-away');
+                    
+                    // Tampilkan text sedih
+                    setTimeout(() => {
+                        sadText.style.opacity = '1';
+                    }, 1500);
+                    return;
+                }
+
+                heartCount++;
+                
+                // Dino2 menghadap ke dino1
+                dino2.classList.add('dino-facing-left');
+                
+                // Posisi hati di tangan dino1
+                const dino1Rect = dino1.getBoundingClientRect();
+                const sceneRect = document.querySelector('.scene').getBoundingClientRect();
+                
+                heart.style.left = (dino1Rect.left - sceneRect.left + 70) + 'px';
+                heart.style.bottom = '35%';
+                heart.style.opacity = '1';
+                heart.classList.add('heart-in-hand');
+
+                setTimeout(() => {
+                    // Animasi hati bergerak ke dino2
+                    const dino2Rect = dino2.getBoundingClientRect();
+                    heart.style.transition = 'all 1s ease-in-out';
+                    heart.style.left = (dino2Rect.left - sceneRect.left + 40) + 'px';
+                    heart.style.bottom = '35%';
+                    heart.classList.remove('heart-in-hand');
+
+                    setTimeout(() => {
+                        // Hati ditolak - kembali ke dino1
+                        heart.style.transition = 'all 1s ease-in-out';
+                        heart.style.left = (dino1Rect.left - sceneRect.left + 70) + 'px';
+                        heart.style.bottom = '35%';
+
+                        setTimeout(() => {
+                            // Hati retak
+                            heart.style.opacity = '0';
+                            brokenHeart.style.left = heart.style.left;
+                            brokenHeart.style.bottom = heart.style.bottom;
+                            brokenHeart.style.opacity = '1';
+                            
+                            // Dino2 berbalik lagi (menghindar)
+                            dino2.classList.remove('dino-facing-left');
+                            
+                            setTimeout(() => {
+                                brokenHeart.style.opacity = '0';
+                                
+                                // Kembali ke posisi awal untuk hati berikutnya
+                                setTimeout(() => {
+                                    // Dino2 menghadap lagi untuk penolakan berikutnya
+                                    if (heartCount < maxHearts) {
+                                        dino2.classList.add('dino-facing-left');
+                                    }
+                                    giveHeart();
+                                }, 500);
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }
+        }
+
+        function restartAnimation() {
+            heartCount = 0;
+            const dino1 = document.getElementById('dino1');
+            const dino2 = document.getElementById('dino2');
+            
+            // Reset animasi
+            dino1.classList.remove('walk-across');
+            dino2.classList.remove('run-away');
+            dino2.classList.add('dino-facing-left');
+            
+            // Tunggu sebentar lalu mulai lagi
+            setTimeout(startAnimation, 100);
+        }
+
+        // Jalankan animasi ketika halaman dimuat
+        window.onload = startAnimation;
+    </script>
+</body>
+</html>
